@@ -6,20 +6,24 @@ require_once 'ga_data.php';
 
 // If the user has already authorized this app then get an access token
 // else redirect to ask the user to authorize access to Google Analytics.
-if ( !isset($_SESSION['access_token']) && !$_SESSION['access_token']) {
+// if ( !isset($_SESSION['access_token']) && !$_SESSION['access_token']) {
     
-    $redirect_uri = 'fetch-data-ga/oauth2callback.php';
-    header('Location: ' . $redirect_uri);
-} 
+//     $redirect_uri = 'http://' . $_SERVER['HTTP_HOST'] . '/fetch-data-ga/oauth2callback.php';
+//     header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
+// } 
 
 // Create the client object and set the authorization configuration
 // from the client_secretes.json you downloaded from the developer console.
 $client = new Google_Client();
 $client->setAuthConfigFile('client_secrets.json');
 $client->addScope(Google_Service_Analytics::ANALYTICS_READONLY);
-
-// Set the access token on the client.
 $client->setAccessToken($_SESSION['access_token']);
+
+//Make sure access_token is refresh at any time
+if($client->isAccessTokenExpired()) {
+    $redirect_uri = 'http://localhost/fetch-data-ga/oauth2callback.php';
+    header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
+} 
 
 // Create an authorized analytics service object.
 $analytics = new Google_Service_Analytics($client);
@@ -36,8 +40,7 @@ if (isset($_POST) && count($_POST)) {
     $endDay = 'today';
     $showTable = true;
 
-    $fetchData = $ga_data->fetchDataFromProperty($_POST['profileId'], $startDay, $endDay, $metric);
-
+    $fetchData = $ga_data->fetchDataFromProperty($_POST['profileId'], $startDay, $endDay, $metric); 
 }   
 
 ?>

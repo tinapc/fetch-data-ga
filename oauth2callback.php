@@ -8,6 +8,8 @@ session_start();
 $client = new Google_Client();
 $client->setAuthConfigFile('client_secrets.json');
 $client->setRedirectUri('http://localhost/fetch-data-ga/oauth2callback.php');
+//$client->setAccessType('offline');
+//$client->setApprovalPrompt('force');
 $client->addScope(Google_Service_Analytics::ANALYTICS_READONLY);
 
 // Handle authorization flow from the server.
